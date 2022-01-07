@@ -1,7 +1,5 @@
-module.exports = {
-    get AU_IN_KILOMETERS() { return 149587870 },
+export const AU_IN_KILOMETERS = 149587870
 
-    convertAUtoKm(au) {
-        return au * this.AU_IN_KILOMETERS
-    }
+export function convertAUtoKm(au) {
+    return au * AU_IN_KILOMETERS
 }
