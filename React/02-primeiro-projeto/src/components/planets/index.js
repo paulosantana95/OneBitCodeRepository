@@ -1,5 +1,6 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import Planet from './planet';
+import Form from './form';
 
 
 async function getPlanets(){
@@ -7,47 +8,49 @@ async function getPlanets(){
     let data = await response.json();
     return data;
 }
-class Planets extends React.Component {
-    constructor(props){
-        super(props);
-        this.state = {
-            planets: []
-        }
-    }
 
-    componentDidMount() {
+// componentDidMount() {
+//     getPlanets().then(data => {
+//         this.setState(state => ({
+//             planets: data['planets']
+//         }))
+//     })
+// }
+
+
+const Planets = () => {
+    const [planets, setPlanets] = useState([])
+
+    useEffect(() => {
         getPlanets().then(data => {
-            this.setState(state => ({
-                planets: data['planets']
-            }))
+            setPlanets(data['planets']);
         })
+    }, [])
+
+    const addPlanet = (new_planet) => {
+        setPlanets([...planets, new_planet])
+    }
+
+    
+    const removeLast = () => {
+        let new_planets = [...planets];
+        new_planets.pop();
+        setPlanets(new_planets);
     }
 
 
-    removeLast = () => {
-        let new_planets = [...this.state.planets]
-        new_planets.pop()
-        this.setState(state => ({
-            planets: new_planets
-        }))
+    const duplicateLastPlanet = () => {
+        let last_planet = planets[planets.length -1];
+        setPlanets([...planets, last_planet]);
     }
 
-
-    duplicateLastPlanet = () => {
-        let last_planet = this.state.planets[this.state.planets.length -1]
-        this.setState(state => ({
-            planets: [...this.state.planets, last_planet]
-        }))
-    }
-
-    render(){
         return(
             <Fragment>
                 <h3>Planets List</h3>
-                <button onClick={this.removeLast}>Remove Last</button>
-                <button onClick={this.duplicateLastPlanet}>Duplicate Laste</button>
                 <hr />
-                {this.state.planets.map((planet, index) =>
+                <Form addPlanet={addPlanet}/>
+                <hr />
+                {planets.map((planet, index) =>
                 <Planet 
                     id={planet.id}
                     name={planet.name}
@@ -59,7 +62,6 @@ class Planets extends React.Component {
                 )}
             </Fragment>
         )
-    };
 }
 
 export default Planets;

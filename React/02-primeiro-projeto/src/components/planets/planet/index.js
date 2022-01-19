@@ -1,7 +1,7 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import GrayImg from '../../shared/gray_img';
 import DescriptionWithLink from '../../shared/description_with_link'
-
+import Form from './form';
 
 async function getSatellites(id){
     let response = await fetch(`http://localhost:3000/api/${id}.json`)
@@ -9,44 +9,43 @@ async function getSatellites(id){
     return data;
 }
 
-class Planet extends React.Component {
-    constructor(props){
-        super(props);
-        this.state = {
-            satellites: []
-        }
-    }
 
-    componentDidMount(){
-        getSatellites(this.props.id).then(data => {
-            this.setState(state => ({
-                satellites: data['satellites']
-            }))
+const Planet = (props) => {
+    const [satellites, setSatellites] = useState([])
+
+    useEffect(() => {
+        getSatellites(props.id).then(data => {
+            setSatellites(data['satellites']);
         })
+    }, [])
+
+    const addSatellite = (new_satellite) => {
+        setSatellites([...satellites, new_satellite])
     }
 
-    render() {
         let title;
-        if(this.props.title_with_underline) 
-            title = <h4><u>{this.props.name}</u></h4>
+        if(props.title_with_underline) 
+            title = <h4><u>{props.name}</u></h4>
         else
-            title = <h4>{this.props.name}</h4>
+            title = <h4>{props.name}</h4>
 
         return(
             <div>
                 {title}
-                <DescriptionWithLink description={this.props.description} link={this.props.link} />
-                <GrayImg img_url={this.props.img_url} gray={this.props.gray}/>
+                <DescriptionWithLink description={props.description} link={props.link} />
+                <GrayImg img_url={props.img_url} gray={props.gray}/>
                 <h4>Satélites</h4>
+                <hr />
+                <Form addSatellite={addSatellite}/>
+                <hr />
                 <ul>
-                    {this.state.satellites.map((satellites, index) => 
+                    {satellites.map((satellites, index) => 
                         <li key={index}>{satellites.name}</li>
                     )}
                 </ul>
                 <hr />
             </div>
         )
-    }
 }
 
 export default Planet;
